@@ -7,7 +7,7 @@ using Random = UnityEngine.Random;
 
 public class SpawnPedestrian : MonoBehaviour
 {
-    [SerializeField] private GameObject _pedestrianPrefab;
+    [SerializeField] private GameObject[] _pedestrianPrefab;
     [SerializeField] private int _pedestrianCount;
 
     private void Start()
@@ -20,7 +20,7 @@ public class SpawnPedestrian : MonoBehaviour
         int count = 0;
         while (count < _pedestrianCount)
         {
-            GameObject obj = Instantiate(_pedestrianPrefab);
+            GameObject obj = Instantiate(_pedestrianPrefab[Random.Range(0, _pedestrianPrefab.Length)]);
             Transform child = transform.GetChild(Random.Range(0, transform.childCount - 1));
             obj.GetComponent<WaypointNavigator>()._currentWaypoint = child.GetComponent<Waypoint>();
             obj.transform.position = child.position;
