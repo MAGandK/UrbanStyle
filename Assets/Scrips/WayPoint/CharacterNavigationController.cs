@@ -25,9 +25,9 @@ public class CharacterNavigationController : MonoBehaviour
         {
             Vector3 destinationDirection = _destination - transform.position;
             destinationDirection.y = 0;
-
+        
             float destinationDistance = destinationDirection.magnitude;
-
+        
             if (destinationDistance >= _stopDistance)
             {
                 _IsReachedDestination = false;
@@ -42,6 +42,7 @@ public class CharacterNavigationController : MonoBehaviour
             }
         }
     }
+
 
     public void SetDestination(Vector3 pointPosition, string pointName)
     {
