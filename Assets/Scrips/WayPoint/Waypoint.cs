@@ -1,8 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SocialPlatforms;
-
-
 public class Waypoint : MonoBehaviour
 {
    public Waypoint _previosWaypoint;

@@ -1,9 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
-
 public class CharacterNavigationController : MonoBehaviour
 {
     [SerializeField] private float _speed;
@@ -42,7 +37,6 @@ public class CharacterNavigationController : MonoBehaviour
             }
         }
     }
-
 
     public void SetDestination(Vector3 pointPosition, string pointName)
     {
