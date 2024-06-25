@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.AI;
+
 public class CharacterNavigationController : MonoBehaviour
 {
     [SerializeField] private float _speed;
@@ -7,12 +9,23 @@ public class CharacterNavigationController : MonoBehaviour
 
     private Vector3 _destination;
     [SerializeField] private string _name;
+
+    //private CharacterController _characterController;
+    private NavMeshAgent _agent;
+    
      public bool _IsReachedDestination;
      private void Start()
      {
          _destination = transform.position;
-         
-         _IsReachedDestination = true;
+
+        // _characterController = GetComponent<CharacterController>();
+        _agent = GetComponent<NavMeshAgent>();
+        
+        _agent.speed = _speed;
+        _agent.stoppingDistance = _stopDistance;
+        _destination = transform.position;
+        
+        _IsReachedDestination = true;
      }
     private void Update()
     {
@@ -26,16 +39,22 @@ public class CharacterNavigationController : MonoBehaviour
             if (destinationDistance >= _stopDistance)
             {
                 _IsReachedDestination = false;
+                
                 Quaternion targetRotation = Quaternion.LookRotation(destinationDirection);
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation,
                     _rotationSpeed * Time.deltaTime);
-                transform.Translate(Vector3.forward * _speed * Time.deltaTime);
+                // Vector3 movement = destinationDirection.normalized * (_speed * Time.deltaTime);
+                // movement.y = -1f;
+                // _characterController.Move(movement);
+                _agent.SetDestination(_destination);
             }
             else
             {
                 _IsReachedDestination = true;
+                _agent.ResetPath();
             }
         }
+        
     }
 
     public void SetDestination(Vector3 pointPosition, string pointName)
