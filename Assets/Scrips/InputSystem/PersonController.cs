@@ -7,10 +7,11 @@ public class PersonController : MonoBehaviour
     #region Bullet
     [SerializeField] private Transform _bulletParent;
     [SerializeField] private Transform _gunTransform;
-    [SerializeField] private Transform _cameraTransform;
     [SerializeField] private float _bulletHitMiss = 25f;
     #endregion
 
+    [SerializeField] private Transform _cameraTransform;
+    private Animator _animator;
     private CharacterController _characterController;
     
     private Vector3 _moveInput;
@@ -18,8 +19,16 @@ public class PersonController : MonoBehaviour
     private Vector2 _currentBleandAnim;
     private Vector2 _animationVelocity;
     [SerializeField] private float _playerSpeed;
+    private bool isGround;
+    private Vector3 _playerVelocity;
+    [SerializeField] private float _jumpHeight;
+    private float _gravityValue = -9.81f;
+    [SerializeField] private float _rotationSpeed = 2f;
     [SerializeField] private float _animSmoothTime = 0.2f;
-    
+    [SerializeField] private float _animationPlayTransition;
+    private int _moveXAnimationParametrId;
+    private int _moveYAnimationParametrId;
+    private int _jumpAnimation;
     public Vector2 MoveInput
     {
         set
@@ -32,6 +41,10 @@ public class PersonController : MonoBehaviour
     private void Awake()
     {
         _cameraTransform = Camera.main.transform;
+        _animator = GetComponent<Animator>();
+        _moveXAnimationParametrId = Animator.StringToHash("MovementX");
+        _moveYAnimationParametrId = Animator.StringToHash("MovementY");
+        _jumpAnimation = Animator.StringToHash("Jump");
     }
 
     private void Start()
@@ -41,9 +54,32 @@ public class PersonController : MonoBehaviour
 
     private void Update()
     {
+        GroundCheak();
         MovedCharacter();
+        JumpCharacter();
+        RotateToDirection();
     }
 
+    private void GroundCheak()
+    {
+        isGround = _characterController.isGrounded;
+        if (isGround && _playerVelocity.y < 0)
+        {
+            _playerVelocity.y = 0;
+        }
+    }
+    private void JumpCharacter()
+    {
+        if (isGround && isJump)
+        {
+            _playerVelocity.y = Mathf.Sqrt(_jumpHeight * -3.0f * _gravityValue);
+            _animator.CrossFade(_jumpAnimation,_animationPlayTransition);
+            isJump = false;
+        }
+
+        _playerVelocity.y += _gravityValue * Time.deltaTime;
+        _characterController.Move(_playerVelocity * Time.deltaTime);
+    }
     private void MovedCharacter()
     {
         _currentBleandAnim = Vector2.SmoothDamp(_currentBleandAnim,_moveInput, ref _animationVelocity, _animSmoothTime);
@@ -51,6 +87,18 @@ public class PersonController : MonoBehaviour
         _move = _cameraTransform.right * _moveInput.x + _cameraTransform.forward * _moveInput.y;
         _move.y = 0;
         _characterController.Move(_move * Time.deltaTime * _playerSpeed);
+        
+        _animator.SetFloat(_moveXAnimationParametrId,_currentBleandAnim.x);
+        _animator.SetFloat(_moveYAnimationParametrId,_currentBleandAnim.y);
+    }
+
+    private void RotateToDirection()
+    {
+        if (_moveInput != Vector3.zero)
+        {
+            Quaternion rotation = Quaternion.Euler(0f,_cameraTransform.eulerAngles.y,0f);
+            transform.rotation = Quaternion.Lerp(transform.rotation,rotation, Time.deltaTime * _rotationSpeed);
+        }
     }
 
     public void ShootGun()
