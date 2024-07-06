@@ -98,13 +98,14 @@ public class PersonController : MonoBehaviour
         _move = new Vector3(_currentBleandAnim.x, 0, _currentBleandAnim.y);
         _move = _cameraTransform.right * _moveInput.x + _cameraTransform.forward * _moveInput.y;
         _move.y = 0;
-        float speed = isRun ? _playerSpeed * 2 : _playerSpeed; 
+        float speed = isRun ? _playerSpeed * 4 : _playerSpeed; 
         _characterController.Move(_move * Time.deltaTime * speed);
         
         _animator.SetFloat(_moveXAnimationParametrId,_currentBleandAnim.x);
         _animator.SetFloat(_moveYAnimationParametrId,_currentBleandAnim.y);
  
         _animator.SetBool(_runAnimationParamId, isRun);
+        _animator.SetBool("isWalk", !isRun); 
     }
 
     private void RotateToDirection()
