@@ -29,6 +29,9 @@ public class PersonController : MonoBehaviour
     private int _moveXAnimationParametrId;
     private int _moveYAnimationParametrId;
     private int _jumpAnimation;
+    private int _runAnimationParamId;
+    
+    public GameObject Gun;
     public Vector2 MoveInput
     {
         set
@@ -38,6 +41,8 @@ public class PersonController : MonoBehaviour
         }
     }
     public bool isJump;
+    public bool isRun;
+
     private void Awake()
     {
         _cameraTransform = Camera.main.transform;
@@ -45,6 +50,9 @@ public class PersonController : MonoBehaviour
         _moveXAnimationParametrId = Animator.StringToHash("MovementX");
         _moveYAnimationParametrId = Animator.StringToHash("MovementY");
         _jumpAnimation = Animator.StringToHash("Jump");
+        _runAnimationParamId = Animator.StringToHash("isRunning");
+        
+        Gun.SetActive(false);
     }
 
     private void Start()
@@ -60,6 +68,10 @@ public class PersonController : MonoBehaviour
         RotateToDirection();
     }
 
+    public void OnEnableAnimationEvent(string str)
+    {
+        Gun.SetActive(true);
+    }
     private void GroundCheak()
     {
         isGround = _characterController.isGrounded;
@@ -86,10 +98,13 @@ public class PersonController : MonoBehaviour
         _move = new Vector3(_currentBleandAnim.x, 0, _currentBleandAnim.y);
         _move = _cameraTransform.right * _moveInput.x + _cameraTransform.forward * _moveInput.y;
         _move.y = 0;
-        _characterController.Move(_move * Time.deltaTime * _playerSpeed);
+        float speed = isRun ? _playerSpeed * 2 : _playerSpeed; 
+        _characterController.Move(_move * Time.deltaTime * speed);
         
         _animator.SetFloat(_moveXAnimationParametrId,_currentBleandAnim.x);
         _animator.SetFloat(_moveYAnimationParametrId,_currentBleandAnim.y);
+ 
+        _animator.SetBool(_runAnimationParamId, isRun);
     }
 
     private void RotateToDirection()

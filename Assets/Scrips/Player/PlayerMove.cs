@@ -10,6 +10,7 @@ public class PlayerMove : MonoBehaviour
     private bool _isGrounded;
     
     private Rigidbody _rbPlayer;
+    private AnimationController _animationController;
 
     private Vector3 _movementVector
     {
@@ -25,6 +26,7 @@ public class PlayerMove : MonoBehaviour
     {
         _rbPlayer = GetComponent<Rigidbody>();
         _rbPlayer.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+        _animationController = GetComponent<AnimationController>(); 
         if (_layerMask == gameObject.layer)
         {
             Debug.Log("Player SortingLayer must be different from Ground SortingLayer");
@@ -40,15 +42,32 @@ public class PlayerMove : MonoBehaviour
     private void Movement()
     {
         _rbPlayer.AddForce(_movementVector * _speed, ForceMode.Impulse);
+        
+        if (_movementVector != Vector3.zero)
+        {
+            if (Input.GetKey(KeyCode.RightShift))
+            {
+                Debug.Log("Running");
+                _animationController.Move(true); 
+            }
+            else
+            {
+                Debug.Log("Walking");
+                _animationController.Move(false); 
+            }
+        }
+        else
+        {
+            _animationController.StopMove();
+        }
     }
     private void Jump()
     {
         if (_isGrounded && (Input.GetAxis("Jump") > 0))
         {
-            if (_isGrounded)
-            {
-            _rbPlayer.AddForce(Vector3.up * _jumpForce, ForceMode.Impulse);
-            }
+                _rbPlayer.AddForce(Vector3.up * _jumpForce, ForceMode.Impulse);
+            
+                _animationController.Jump();
         }
     }
 
@@ -67,6 +86,10 @@ public class PlayerMove : MonoBehaviour
         if (collision.gameObject.tag == "Ground")
         {
             _isGrounded = value;
+            if (value)
+            {
+                _animationController.StopJump(); 
+            }
         }
     }
 }

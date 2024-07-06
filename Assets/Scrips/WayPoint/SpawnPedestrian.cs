@@ -22,9 +22,10 @@ public class SpawnPedestrian : MonoBehaviour
         {
             GameObject obj = Instantiate(_pedestrianPrefab[Random.Range(0, _pedestrianPrefab.Length)]);
             Transform child = transform.GetChild(Random.Range(0, transform.childCount - 1));
-            obj.GetComponent<WaypointNavigator>()._currentWaypoint = child.GetComponent<Waypoint>();
+            Waypoint waypoint = child.GetComponent<Waypoint>();
+            obj.GetComponent<WaypointNavigator>()._currentWaypoint = waypoint;
             obj.transform.position = child.position;
-
+        
             yield return new WaitForEndOfFrame();
             count++;
         }

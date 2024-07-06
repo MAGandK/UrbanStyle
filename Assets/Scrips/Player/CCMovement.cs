@@ -2,7 +2,8 @@ using UnityEngine;
 
 public class CCMovement : MonoBehaviour
 {
-   [SerializeField] private float _speed;
+   [SerializeField] private float _walkSpeed = 3f;
+   [SerializeField] private float _runSpeed = 6f;
    [SerializeField] private float _mouseSensetivity = 100;
    [SerializeField] private float _gravity = -9.81f;
 
@@ -26,6 +27,7 @@ public class CCMovement : MonoBehaviour
        Movement();
        RotateCharacter();
        ApplyGravity();
+       
    }
 
    private void ApplyGravity()
@@ -34,6 +36,9 @@ public class CCMovement : MonoBehaviour
       {
          _velocity.y = -2f;
       }
+      
+      _velocity.y += _gravity * Time.deltaTime;
+      _characterController.Move(_velocity * Time.deltaTime);
    }
 
    private void RotateCharacter()
@@ -50,21 +55,33 @@ public class CCMovement : MonoBehaviour
       _cameraTransform.localRotation = Quaternion.Euler(_rotationX, 0,0);
       
    }
-
+   
+   
    private void Movement()
    {
       float moveX = Input.GetAxis("Horizontal");
       float moveZ = Input.GetAxis("Vertical");
 
       Vector3 move = transform.right * moveX + transform.forward * moveZ;
-      _characterController.Move(move * _speed * Time.deltaTime);
+      float speed = Input.GetKey(KeyCode.RightShift) ? _runSpeed : _walkSpeed; 
+      _characterController.Move(move * speed * Time.deltaTime);
+      
       if (move != Vector3.zero)
       {
-         _animationController.Move();
+         _animationController.Move(speed > _walkSpeed);
       }
       else
       {
          _animationController.StopMove();
+      }
+      if (Input.GetButtonDown("Jump") && _characterController.isGrounded) 
+      {
+         _velocity.y = Mathf.Sqrt(-2f * _gravity * 2f); 
+         _animationController.Jump();
+      }
+      else
+      {
+         _animationController.StopJump(); 
       }
    }
 }
