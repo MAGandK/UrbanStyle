@@ -31,7 +31,7 @@ public class InputController : MonoBehaviour
    }
    private void Shoting()
    {
-       //_personController.ShootGun();
+       _personController.ShootGun();
    }
    private void Update()
    {

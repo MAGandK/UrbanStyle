@@ -30,6 +30,7 @@ public class PersonController : MonoBehaviour
     private int _moveYAnimationParametrId;
     private int _jumpAnimation;
     private int _runAnimationParamId;
+    private int _shootAnimationParamId;
     
     public GameObject Gun;
     public Vector2 MoveInput
@@ -42,6 +43,7 @@ public class PersonController : MonoBehaviour
     }
     public bool isJump;
     public bool isRun;
+    public bool isShoot;
 
     private void Awake()
     {
@@ -51,7 +53,7 @@ public class PersonController : MonoBehaviour
         _moveYAnimationParametrId = Animator.StringToHash("MovementY");
         _jumpAnimation = Animator.StringToHash("Jump");
         _runAnimationParamId = Animator.StringToHash("isRunning");
-        
+        _shootAnimationParamId = Animator.StringToHash("isShooting");
         Gun.SetActive(false);
     }
 
@@ -66,6 +68,10 @@ public class PersonController : MonoBehaviour
         MovedCharacter();
         JumpCharacter();
         RotateToDirection();
+        if (isShoot)
+        {
+            ShootGun();
+        }
     }
 
     public void OnEnableAnimationEvent(string str)
@@ -120,7 +126,7 @@ public class PersonController : MonoBehaviour
     public void ShootGun()
     {
         GameObject bullet = ObjectPool.SharedInstance.GetPoolesObject();
-        if (bullet !=null)
+        if (bullet != null)
         {
             bullet.transform.parent = _bulletParent;
             bullet.transform.position = _gunTransform.position;
@@ -130,7 +136,7 @@ public class PersonController : MonoBehaviour
 
         BulletController bulletController = bullet.GetComponent<BulletController>();
         RaycastHit hit;
-        if (Physics.Raycast(_cameraTransform.position, _cameraTransform.forward, out hit,Mathf.Infinity))
+        if (Physics.Raycast(_cameraTransform.position, _cameraTransform.forward, out hit, Mathf.Infinity))
         {
             bulletController.Target = hit.point;
             bulletController.Hit = true;
@@ -140,5 +146,7 @@ public class PersonController : MonoBehaviour
             bulletController.Target = _cameraTransform.position + _cameraTransform.forward * _bulletHitMiss;
             bulletController.Hit = false;
         }
+
+        _animator.SetTrigger(_shootAnimationParamId);
     }
 }

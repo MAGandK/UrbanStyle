@@ -2,12 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class ObjectPool : MonoBehaviour
 {
   public static ObjectPool SharedInstance;
   [SerializeField] private List<GameObject> _poolObjects;
-  [SerializeField] private GameObject _objectToPool;
+  [SerializeField] private GameObject _objectToPoolPrefab;
   [SerializeField] private int _amountToPool;
 
   private void Awake()
@@ -17,11 +18,18 @@ public class ObjectPool : MonoBehaviour
 
   private void Start()
   {
-    _poolObjects = new List<GameObject>();
-    GameObject poolTemp;
+    if (_poolObjects == null)
+    {
+      _poolObjects = new List<GameObject>();
+    }
+    else
+    {
+      _poolObjects.Clear();
+    }
+
     for (int i = 0; i < _amountToPool; i++)
     {
-      poolTemp = Instantiate(_objectToPool);
+      GameObject poolTemp = Instantiate(_objectToPoolPrefab);
       poolTemp.SetActive(false);
       _poolObjects.Add(poolTemp);
     }
@@ -36,7 +44,7 @@ public class ObjectPool : MonoBehaviour
         return _poolObjects[i];
       }
     }
-    
+
     return null;
   }
 }

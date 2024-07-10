@@ -1,10 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
-using UnityEngine.Serialization;
-
 public class CarControl : MonoBehaviour
 {
     [SerializeField] private float _motorTorque = 500f;
@@ -59,6 +53,5 @@ public class CarControl : MonoBehaviour
                 wheel.WheelCollider.motorTorque = 0;
             }
         }
-
     }
 }
