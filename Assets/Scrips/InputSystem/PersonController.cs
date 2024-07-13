@@ -1,6 +1,4 @@
-using System;
 using UnityEngine;
-using UnityEngine.Pool;
 
 public class PersonController : MonoBehaviour
 {
@@ -8,11 +6,14 @@ public class PersonController : MonoBehaviour
     [SerializeField] private Transform _bulletParent;
     [SerializeField] private Transform _gunTransform;
     [SerializeField] private float _bulletHitMiss = 25f;
+    [SerializeField] private LayerMask _ignoreMask;
     #endregion
 
     [SerializeField] private Transform _cameraTransform;
     private Animator _animator;
     private CharacterController _characterController;
+    private FieldOfView _fieldOfView;
+    private AnimationController _animationController;
     
     private Vector3 _moveInput;
     private Vector3 _move;
@@ -31,6 +32,7 @@ public class PersonController : MonoBehaviour
     private int _jumpAnimation;
     private int _runAnimationParamId;
     private int _shootAnimationParamId;
+    private int _idleAnimationParamId;
     
     public GameObject Gun;
     public Vector2 MoveInput
@@ -54,6 +56,8 @@ public class PersonController : MonoBehaviour
         _jumpAnimation = Animator.StringToHash("Jump");
         _runAnimationParamId = Animator.StringToHash("isRunning");
         _shootAnimationParamId = Animator.StringToHash("isShooting");
+        _idleAnimationParamId = Animator.StringToHash("isIdle");
+        
         Gun.SetActive(false);
     }
 
@@ -111,7 +115,16 @@ public class PersonController : MonoBehaviour
         _animator.SetFloat(_moveYAnimationParametrId,_currentBleandAnim.y);
  
         _animator.SetBool(_runAnimationParamId, isRun);
-        _animator.SetBool("isWalk", !isRun); 
+        _animator.SetBool("isWalk", _moveInput != Vector3.zero && !isRun); 
+        
+        if (_moveInput == Vector3.zero && !isRun && !isShoot)
+        {
+            _animator.SetBool(_idleAnimationParamId, true);
+        }
+        else
+        {
+            _animator.SetBool(_idleAnimationParamId, false);
+        }
     }
 
     private void RotateToDirection()
@@ -132,21 +145,29 @@ public class PersonController : MonoBehaviour
             bullet.transform.position = _gunTransform.position;
             bullet.transform.rotation = _gunTransform.rotation;
             bullet.SetActive(true);
-        }
 
-        BulletController bulletController = bullet.GetComponent<BulletController>();
-        RaycastHit hit;
-        if (Physics.Raycast(_cameraTransform.position, _cameraTransform.forward, out hit, Mathf.Infinity))
-        {
-            bulletController.Target = hit.point;
-            bulletController.Hit = true;
+            BulletController bulletController = bullet.GetComponent<BulletController>();
+            
+            Ray ray = new Ray(transform.position, _cameraTransform.forward);
+            
+            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, _ignoreMask)) 
+            {
+                bulletController.Target = hit.point;
+                bulletController.Hit = true;
+            }
+            else
+            {
+                bulletController.Target = _cameraTransform.position + _cameraTransform.forward * _bulletHitMiss;
+                bulletController.Hit = false;
+            }
+        
+            Debug.DrawLine(_cameraTransform.transform.position, bulletController.Target, Color.magenta);
+            _animator.SetBool(_shootAnimationParamId,true);
+            _animationController.Shooting();
         }
         else
         {
-            bulletController.Target = _cameraTransform.position + _cameraTransform.forward * _bulletHitMiss;
-            bulletController.Hit = false;
+            Debug.Log("Не удалось получить пулю из пула объектов.");
         }
-
-        _animator.SetTrigger(_shootAnimationParamId);
     }
 }

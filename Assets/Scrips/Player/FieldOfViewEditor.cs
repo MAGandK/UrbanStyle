@@ -23,7 +23,7 @@ public class FieldOfViewEditor : Editor
         Handles.color = Color.red;
         foreach (var visibleTarget in fov.VisibleTarget)
         {
-            Handles.DrawLine(fov.transform.position, visibleTarget.position,thickness);
+            Handles.DrawLine(fov.transform.position, visibleTarget.transform.position,thickness);
         }
     }
 }

@@ -72,7 +72,7 @@ public class CCMovement : MonoBehaviour
       }
       else
       {
-         _animationController.StopMove();
+         _animationController.Idle();
       }
       if (Input.GetButtonDown("Jump") && _characterController.isGrounded) 
       {

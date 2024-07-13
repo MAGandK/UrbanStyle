@@ -25,6 +25,7 @@ public class BulletController : MonoBehaviour
 
     private void LateUpdate()
     {
+        Debug.Log("Target: " + Target);
         transform.position = Vector3.MoveTowards(transform.position, Target, _speed * Time.deltaTime);
         if (!Hit && Vector3.Distance(transform.position,Target) < 0.1f)
         {

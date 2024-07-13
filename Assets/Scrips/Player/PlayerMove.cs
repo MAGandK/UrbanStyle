@@ -58,7 +58,7 @@ public class PlayerMove : MonoBehaviour
         }
         else
         {
-            _animationController.StopMove();
+            _animationController.Idle();
         }
     }
     private void Jump()

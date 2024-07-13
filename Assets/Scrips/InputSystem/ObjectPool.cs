@@ -1,19 +1,25 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
+
 
 public class ObjectPool : MonoBehaviour
 {
   public static ObjectPool SharedInstance;
+  
   [SerializeField] private List<GameObject> _poolObjects;
   [SerializeField] private GameObject _objectToPoolPrefab;
   [SerializeField] private int _amountToPool;
 
   private void Awake()
   {
-    SharedInstance = this;
+    if (SharedInstance == null)
+    {
+      SharedInstance = this;
+    }
+    else
+    {
+      Destroy(gameObject);
+    }
   }
 
   private void Start()

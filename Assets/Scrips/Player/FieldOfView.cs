@@ -5,16 +5,16 @@ using UnityEngine;
 public class FieldOfView : MonoBehaviour
 {
     public float ViewRadius;
-    [Range(0, 360)] public float viewAngle;
+    [Range(0, 360)]
+    public float viewAngle;
     [SerializeField] private LayerMask _targetMask;
     [SerializeField] private LayerMask _obstacleMask;
     [SerializeField] private float _delayTime = 0.2f;
-    public List<Transform> VisibleTarget;
-
+    public List<Transform> VisibleTarget = new List<Transform>();
 
     private void Start()
     {
-        StartCoroutine("FindTarget", _delayTime);
+        StartCoroutine(FindTarget(_delayTime));
     }
 
     IEnumerator FindTarget(float delay)
@@ -25,24 +25,30 @@ public class FieldOfView : MonoBehaviour
             FindVisibleTarget();
         }
     }
+
     public void FindVisibleTarget()
     {
         List<Transform> newVisibleTargets = new List<Transform>();
-        Collider[] targetInRadius = Physics.OverlapSphere(transform.position, ViewRadius, _targetMask);
-        
-        for (int i = 0; i < targetInRadius.Length; i++)
+
+        Collider[] targetsInViewRadius = Physics.OverlapSphere(transform.position, ViewRadius, _targetMask);
+
+        for (int i = 0; i < targetsInViewRadius.Length; i++)
         {
-            Transform target = targetInRadius[i].transform;
-            Vector3 dirToTarget = (target.position - transform.position);
-            if (Vector3.Angle(transform.forward, dirToTarget)< viewAngle / 2)
+            Transform target = targetsInViewRadius[i].transform;
+            Vector3 dirToTarget = (target.position - transform.position).normalized;
+
+            if (Vector3.Angle(transform.forward, dirToTarget) < viewAngle / 2)
             {
-                if (Physics.Raycast(transform.position, dirToTarget, _targetMask))
+                float distanceToTarget = Vector3.Distance(transform.position, target.position);
+                Vector3 rayOrigin = transform.position + Vector3.up; 
+
+                if (!Physics.Raycast(rayOrigin, dirToTarget, distanceToTarget, _obstacleMask))
                 {
                     newVisibleTargets.Add(target);
                 }
             }
         }
-        
+
         for (int i = VisibleTarget.Count - 1; i >= 0; i--)
         {
             if (!newVisibleTargets.Contains(VisibleTarget[i]))
@@ -50,7 +56,7 @@ public class FieldOfView : MonoBehaviour
                 VisibleTarget.RemoveAt(i);
             }
         }
-        
+
         foreach (Transform target in newVisibleTargets)
         {
             if (!VisibleTarget.Contains(target))
@@ -59,7 +65,7 @@ public class FieldOfView : MonoBehaviour
             }
         }
     }
-
+    
     public Vector3 DirectionFromAngle(float angleDegrees, bool isAngleGlobal)
     {
         if (!isAngleGlobal)

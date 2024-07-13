@@ -19,7 +19,12 @@ public class AnimationController : MonoBehaviour
       Gun.SetActive(false);
    }
 
-   
+   public void Idle()
+   {
+      _animationController.SetBool("isIdle", true);
+      _animationController.SetBool("isWalk", false);
+      _animationController.SetBool("isRun", false);
+   }
    public void Move(bool isRunning)
    {
       _animationController.SetBool("isWalk", !isRunning);
@@ -39,5 +44,10 @@ public class AnimationController : MonoBehaviour
    public void StopJump()
    {
       _animationController.SetBool("isJump", false);
+   }
+
+   public void Shooting()
+   {
+      _animationController.SetBool("isShooting", true);
    }
 }
